@@ -1,0 +1,57 @@
+# COMPILER OPTIONS
+CC = gcc
+CFLAGS = -Wall -g -I./include -I./external/include
+
+# LINKER OPTIONS
+LDFLAGS = -L./external/lib
+LDLIBS = 
+
+RPATH_FLAGS += -Wl,-rpath,'@loader_path/lib'
+# RPATH_FLAGS += -Wl,-rpath,'$$ORIGIN/lib'
+
+
+# DIRECTORIES
+SRC_DIR = src
+BUILD_DIR = build
+OBJ_DIR = build/obj
+
+BIN_DIR = $(BUILD_DIR)/bin
+BIN_LIBS_DIR = $(BIN_DIR)/lib
+BIN_ASSETS = $(BIN_DIR)/assets
+
+# FILES
+C_FILES = src/main.c \
+					
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_FILES))
+
+# NAME AND PATH TO BUILDED PROGRAM
+TARGET = $(BIN_DIR)/program
+
+# DECLARE THAT IS FUNCTIONS
+.PHONY: all clean
+
+# TARGETS
+all: $(TARGET)
+
+$(TARGET): $(OBJ_FILES) | $(BIN_DIR)
+		@echo "[ Сборка файлов $(OBJ_FILES) в программу ]"
+		$(CC) $(CFLAGS) $(LDFLAGS) $(RPATH_FLAGS) $(OBJ_FILES) ${LDLIBS} -o $(TARGET)
+
+		@echo "[ Копирование билиотек в папку $(BIN_LIBS_DIR) ]"
+		cp -r ./external/lib $(BIN_LIBS_DIR)
+
+		@echo "[ Копирование assets в папку $(BIN_ASSETS) ]"
+		cp -r ./assets $(BIN_ASSETS)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+		@mkdir -p $(dir $@)
+		@echo "[ Компиляция файла: $< ]"
+		$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR) $(BIN_DIR):
+		@echo "[ Создание директории: $@ ]"
+		mkdir -p $@
+
+clean:
+		@echo "[ Удаление собранного проекта: ]"
+		rm -rf $(BUILD_DIR)
