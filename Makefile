@@ -10,7 +10,8 @@ TEMPLATES_DIR = templates
 build: clean convert-templates
 	@test -d $(BUILD_DIR) || mkdir $(BUILD_DIR)
 	@echo "\n[ Сборка проекта ]"
-	$(CC) $(CFLAGS) $(C_FILES) -o $(BUILD_DIR)/create-c-project
+	$(CC) $(CFLAGS) $(C_FILES) -o $(BUILD_DIR)/ccskel -cpp my_cpp_app
+
 
 .PHONY: build-and-run
 build-and-run: build start
